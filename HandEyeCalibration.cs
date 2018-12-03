@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using CLARTE.Geometry;
+using CLARTE.Geometry.Extensions;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Factorization;
@@ -160,7 +162,7 @@ namespace HandEyeCalibration
 			return Matrix4x4Addition(Q(vi1), W(-vi2)).transpose * Matrix4x4Addition(Q(vi1), W(-vi2));
 		}
 
-		// Return the eigenvector associate with the smallest eigenvalue
+		// Return the eigenvector associated with the smallest eigenvalue
 		// and convert it into a Quaternion
 		static Quaternion SmallestEigenVector(Matrix4x4 m)
 		{
@@ -241,6 +243,7 @@ namespace HandEyeCalibration
 		/// Y * B[i] = B'[i]
 		/// where B'[i] represents B[i] express in A origin coordinate system.
 		/// 
+		/// Application to a robot-camera system:
 		/// If A is the robot coordinate system and B the camera coordinate system,
 		/// then A[i] represents the robot 'hand' coordinate system
 		/// B[i] represents the camera 'eye' coordinate system
@@ -284,7 +287,7 @@ namespace HandEyeCalibration
 
 			// Translation is obtained by a least-square method
 			Matrix<double> matrixQ = ConvertMatrix3x3IntoMathNetMatrix(Matrix4x4.Rotate(q).ExtractRotationMatrix());
-			Matrix<double> matrixI = ConvertMatrix3x3IntoMathNetMatrix(Matrix3x3.identity);
+			Matrix<double> matrixI = ConvertMatrix3x3IntoMathNetMatrix(Matrix3x3.Identity);
 
 			Matrix<double> lhsPos = Matrix<double>.Build.Dense(3, 3);
 			Vector<double> rhsPos = Vector<double>.Build.Dense(3);

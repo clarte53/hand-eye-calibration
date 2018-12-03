@@ -3,15 +3,11 @@
 	<name>hand-eye-calibration</name>
 	<dependencies>
 		<DependencyDesc>
-			<address>git@192.168.54.21:math</address>
+			<address>ssh://git@gitlab.clarte.asso.fr:53000/modules/clarte-utils.git</address>
 			<commitId></commitId>
 		</DependencyDesc>
 		<DependencyDesc>
 			<address>Math.Net</address>
-			<commitId></commitId>
-		</DependencyDesc>
-		<DependencyDesc>
-			<address>git@192.168.54.21:unity-extensions</address>
 			<commitId></commitId>
 		</DependencyDesc>
 	</dependencies>
