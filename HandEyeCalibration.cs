@@ -5,7 +5,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using UnityEngine;
 
-namespace HandEyeCalibration
+namespace CoRegistration
 {
 	/// <summary>
 	/// 
@@ -49,13 +49,9 @@ namespace HandEyeCalibration
 				return false;
 			}
 
-			Matrix4x4 x = ComputeX(a, b);
+			tracker_offset = ComputeX(a, b); ;
 
-			tracker_offset = x;
-
-			Matrix4x4 y = ComputeY(a, b);
-
-			origin_offset = y;
+			origin_offset = ComputeY(a, b);
 
 			return true;
 		}
@@ -231,7 +227,6 @@ namespace HandEyeCalibration
 			}
 
 			Matrix4x4 x = ComputeCalibration(moveA, moveB);
-			Debug.Log("Transition matrix x : \n" + x);
 
 			return x;
 		}
@@ -263,7 +258,6 @@ namespace HandEyeCalibration
 			}
 
 			Matrix4x4 y = ComputeCalibration(moveA, moveB);
-			Debug.Log("Transition matrix y : \n" + y);
 
 			return y;
 		}
@@ -280,9 +274,6 @@ namespace HandEyeCalibration
 			}
 
 			Quaternion q = SmallestEigenVector(sumRot);
-
-			Debug.Log("Resulting quaternion : " + q.ToString("F5"));
-
 
 			// Translation is obtained by a least-square method
 			Matrix<double> matrixQ = ConvertMatrix3x3IntoMathNetMatrix(Matrix4x4.Rotate(q).ExtractRotationMatrix());
@@ -305,7 +296,6 @@ namespace HandEyeCalibration
 			}
 
 			Vector3 t = ConvertMathNetVectorIntoVector3(lhsPos.Inverse().Multiply(rhsPos));
-			Debug.Log("Resulting translation : " + t.ToString("F5"));
 
 			return Matrix4x4.TRS(t, q, Vector3.one);
 		}
