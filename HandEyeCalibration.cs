@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using CLARTE.Geometry;
 using CLARTE.Geometry.Extensions;
-using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using UnityEngine;
@@ -177,7 +176,7 @@ namespace HandEyeCalibration
 
 			Evd<double> evd = mCopy.Evd();
 
-			Complex min = evd.EigenValues[0];
+			System.Numerics.Complex min = evd.EigenValues[0];
 			int indiceMin = 0;
 			for(int i = 1; i < 4; i++)
 			{
