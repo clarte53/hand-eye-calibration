@@ -3,12 +3,12 @@
 	<name>hand-eye-calibration</name>
 	<dependencies>
 		<DependencyDesc>
-			<address>ssh://git@gitlab.clarte.asso.fr:53000/modules/clarte-utils.git</address>
-			<commitId></commitId>
+			<address>git@github.com:clarte53/clarte-utils.git</address>
+			<commitId>76aca676b2a21e22d799ab78ee6498f5ca5f79db</commitId>
 		</DependencyDesc>
 		<DependencyDesc>
 			<address>Math.Net</address>
-			<commitId></commitId>
+			<commitId>4.5</commitId>
 		</DependencyDesc>
 	</dependencies>
 </DependenciesList>
