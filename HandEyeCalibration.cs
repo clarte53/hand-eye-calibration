@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using CLARTE.Geometry;
-using CLARTE.Geometry.Extensions;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using UnityEngine;
+using System;
 
 namespace CoRegistration
 {
@@ -21,6 +20,158 @@ namespace CoRegistration
 
 	static public class HandEyeCalibration
 	{
+		public struct Matrix3x3
+		{
+			#region Members
+			public const int size = 3;
+
+			// mXY where X = row and Y = column
+			public float m00;
+			public float m10;
+			public float m20;
+			public float m01;
+			public float m11;
+			public float m21;
+			public float m02;
+			public float m12;
+			public float m22;
+			#endregion
+
+			#region Getter / Setter
+			public static Matrix3x3 Zero
+			{
+				get
+				{
+					return new Matrix3x3
+					{
+						m00 = 0f,
+						m01 = 0f,
+						m02 = 0f,
+						m10 = 0f,
+						m11 = 0f,
+						m12 = 0f,
+						m20 = 0f,
+						m21 = 0f,
+						m22 = 0f
+					};
+				}
+			}
+
+			public static Matrix3x3 Identity
+			{
+				get
+				{
+					return new Matrix3x3
+					{
+						m00 = 1f,
+						m01 = 0f,
+						m02 = 0f,
+						m10 = 0f,
+						m11 = 1f,
+						m12 = 0f,
+						m20 = 0f,
+						m21 = 0f,
+						m22 = 1f
+					};
+				}
+			}
+			#endregion
+
+			#region Index accessors
+			public float this[int row, int column]
+			{
+				get
+				{
+					return this[column * size + row];
+				}
+
+				set
+				{
+					this[column * size + row] = value;
+				}
+			}
+
+			public float this[int index]
+			{
+				get
+				{
+					float result;
+
+					switch(index)
+					{
+						case 0:
+							result = m00;
+							break;
+						case 1:
+							result = m10;
+							break;
+						case 2:
+							result = m20;
+							break;
+						case 3:
+							result = m01;
+							break;
+						case 4:
+							result = m11;
+							break;
+						case 5:
+							result = m21;
+							break;
+						case 6:
+							result = m02;
+							break;
+						case 7:
+							result = m12;
+							break;
+						case 8:
+							result = m22;
+							break;
+						default:
+							throw new IndexOutOfRangeException(string.Format("Invalid matrix index '{0}'", index));
+					}
+
+					return result;
+				}
+
+				set
+				{
+					switch(index)
+					{
+						case 0:
+							m00 = value;
+							break;
+						case 1:
+							m10 = value;
+							break;
+						case 2:
+							m20 = value;
+							break;
+						case 3:
+							m01 = value;
+							break;
+						case 4:
+							m11 = value;
+							break;
+						case 5:
+							m21 = value;
+							break;
+						case 6:
+							m02 = value;
+							break;
+						case 7:
+							m12 = value;
+							break;
+						case 8:
+							m22 = value;
+							break;
+						default:
+							throw new IndexOutOfRangeException(string.Format("Invalid matrix index '{0}'", index));
+					}
+				}
+			}
+			#endregion
+		}
+
 		#region Public methods
 		/// <summary>
 		/// Computes Hand Eye Calibration.
@@ -300,5 +451,77 @@ namespace CoRegistration
 			return Matrix4x4.TRS(t, q, Vector3.one);
 		}
 		#endregion
+
+		#region Extension methods
+		public static Quaternion ExtractRotationQuaternion(this Matrix4x4 matrix)
+		{
+			if(!matrix.IsOrthogonal())
+			{
+				Debug.LogWarning("Matrix is not orthogonal: conversion to quaternion doesn't make sense");
+			}
+
+			return Quaternion.LookRotation(matrix.GetColumn(2), matrix.GetColumn(1));
+		}
+
+		public static bool IsOrthogonal(this Matrix4x4 matrix)
+		{
+			bool ret = false;
+
+			Vector4[] c = new Vector4[3];
+
+			for(int i = 0; i < 3; i++)
+			{
+				c[i] = matrix.GetColumn(i);
+			}
+
+			float dot0 = Mathf.Abs(Vector4.Dot(c[0], c[1]));
+			float dot1 = Mathf.Abs(Vector4.Dot(c[1], c[2]));
+			float dot2 = Mathf.Abs(Vector4.Dot(c[0], c[2]));
+
+			if(dot0 < Vector3.kEpsilon && dot1 < Vector3.kEpsilon && dot2 < Vector3.kEpsilon)
+			{
+				ret = true;
+			}
+
+			return ret;
+		}
+
+		public static Matrix3x3 ExtractRotationMatrix(this Matrix4x4 matrix)
+		{
+			Matrix3x3 rot = new Matrix3x3();
+
+			for(int i = 0; i < 3; i++)
+			{
+				for(int j = 0; j < 3; j++)
+				{
+					rot[i, j] = matrix[i, j];
+				}
+			}
+
+			return rot;
+		}
+
+		public static Vector3 ExtractTranslation(this Matrix4x4 matrix)
+		{
+			return matrix.GetColumn(3);
+		}
+
+		static public Vector3 QuaternionAxis(this Quaternion quaternion)
+		{
+			float sin = 1;
+
+			if(quaternion.w < 1)
+			{
+				sin = 1 / Mathf.Sqrt(1 - quaternion.w * quaternion.w);
+			}
+			else
+			{
+				Debug.LogWarning("One the rotations was identity. Computation may be wrong.");
+			}
+
+			return new Vector3(quaternion.x * sin, quaternion.y * sin, quaternion.z * sin);
+		}
+		#endregion
+
 	}
 }
